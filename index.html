@@ -38,15 +38,15 @@
                 <button id="clear-storage">Remove Map Bookmarks</button>
             </div>
             <div style="position:absolute; right:20px; top:10px; z-Index:999;">
-                <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:false, open:false">
-                    <div id="measurementDiv"></div>
+                <div id="titlePane" data-dojo-id="content-two" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:false, open:false, region:'right'">
+                    <div data-dojo-id="measure" id="measurementDiv"></div>
                     <span style="font-size:smaller;padding:5px 5px;">Press <b>CTRL</b> to enable snapping.</span>
                 </div>
             </div>
             <div style="position:absolute; right:20px; bottom:50px; z-Index:999;">
                 <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Switch Basemap', closable:false, open:false">
-                    <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:280px; overflow:auto;">
-                        <div id="basemapGallery"></div>
+                    <div data-dojo-type="dijit/layout/ContentPane"  data-dojo-id="basemap" style="width:380px; height:280px; overflow:auto;">
+                        <div widgetid="base" id="basemapGallery"></div>
 
                     </div>
                 </div>

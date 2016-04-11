@@ -27,3 +27,7 @@ body {
     font-size: 10pt;
     text-align: center;
 }
+
+.drop {
+    background-color: white;
+}

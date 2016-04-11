@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no">
+    <title>Query RelatedRecords Example</title>
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/dijit/themes/tundra/tundra.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/dojox/grid/resources/Grid.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/dojox/grid/resources/tundraGrid.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/3.16/esri/css/esri.css">
+    <link rel="stylesheet" href="style/style.css">
+    <script src="https://js.arcgis.com/3.16/"></script>
+    <script src="js/map2.js"></script>
+</head>
+
+<body class="calcite">
+
+    <div id="mainWindow" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width:100%; height:100%;">
+
+        <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+
+
+            <div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
+                <div id="printButton"></div>
+            </div> <!--       print -->
+
+            <div style="position:absolute; right:840px; top:10px; z-Index:999;"  >
+                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Select', closable:false, open:false">
+                    <div class="drop" id="LayerSelect"></div>
+                </div>
+            </div> <!--       Select -->
+
+            
+            <div style="position:absolute; right:740px; top:10px; z-Index:999;"  >
+                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Legend', closable:false, open:false">
+                    <div class="drop" id="legendDiv"></div>
+                </div>
+            </div> <!--       Bookmarks -->
+            <div style="position:absolute; right:560px; top:10px; z-Index:999;">
+                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Bookmarks', closable:false, open:false">
+                    <div class="drop" id="bookmarks2"></div>
+                </div>
+            </div> <!--       Bookmarks -->
+            <div style="position:absolute; right:380px; top:10px; z-Index:999;">
+                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Draw', closable:false, open:false">
+                    <div class="drop" id="drawingWrapper">
+                        Add some graphics:
+                        <div id="point" class="drawing">Point</div>
+                        <div id="freehandpolyline" class="drawing">Freehand Polyline</div>
+                        <div id="freehandpolygon" class="drawing">Freehand Polygon</div>
+                        <div id="circle" class="drawing">Circle</div>
+                    </div>
+                </div>
+            </div> <!--       Draw -->
+            <div style="position:absolute; right:200px; top:10px; z-Index:999;">
+                <div id="titlePane" data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Measurement', closable:false, open:false">
+                    <div id="measurementDiv" class="drop" ></div>
+                    <span class="drop"  style="font-size:smaller;padding:5px 5px;">Press <b>CTRL</b> to enable snapping.</span>
+                </div>
+            </div> <!--       Measure -->
+            <div style="position:absolute; right:20px; top:10px; z-Index:999;">
+                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Switch Basemap', closable:false, open:false" >
+                    <div data-dojo-type="dijit/layout/ContentPane" style="width:380px; height:280px; overflow:auto;" class="drop" >
+                        <div class="drop" id="basemapGallery"></div>
+                    </div>
+                </div>
+            </div>    <!--       BaseMap -->
+        </div>    <!--        Map -->   
+    </div>    <!--     Main Window -->
+</body>
+
+</html>

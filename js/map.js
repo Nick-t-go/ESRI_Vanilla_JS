@@ -96,12 +96,12 @@ require([
 
 
     };
-    var useLocalStorage = supports_local_storage();
+    // var useLocalStorage = supports_local_storage();
     var storageName = 'esrijsapi_mapmarks';
 
     map.on("load", init)
 
-    dojo.connect(dojo.byId('clear-storage'), 'onclick', clearBookmarks);
+    // dojo.connect(dojo.byId('clear-storage'), 'onclick', clearBookmarks);
     // Draw Toolbar
     var createToolbar = function(theMap) {
         toolbar = new Draw(map);
@@ -163,122 +163,122 @@ require([
 
 
     //Print
-    var app = {};
-    app.map = map;
-    app.printer = new Print({
-        map: app.map,
-        url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
-    }, dom.byId("printButton"));
-    app.printer.startup();
+    // var app = {};
+    // app.map = map;
+    // app.printer = new Print({
+    //     map: app.map,
+    //     url: "https://sampleserver6.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+    // }, dom.byId("printButton"));
+    // app.printer.startup();
 
 
 
     //Basemap switcher
 
-    var basemapGallery = new BasemapGallery({
-        showArcGISBasemaps: true,
-        map: map
-    }, "basemapGallery");
-    basemapGallery.startup();
+    // var basemapGallery = new BasemapGallery({
+    //     showArcGISBasemaps: true,
+    //     map: map
+    // }, "basemapGallery");
+    // basemapGallery.startup();
 
-    basemapGallery.on("error", function(msg) {
-        console.log("basemap gallery error:  ", msg);
-    });
+    // basemapGallery.on("error", function(msg) {
+    //     console.log("basemap gallery error:  ", msg);
+    // });
 
 
     //BookMarks
 
 
-    var bookmark = new Bookmarks({
-        map: map,
-        bookmarks: [],
-        editable: true
-    }, dojo.byId('bookmarks2'));
+    // var bookmark = new Bookmarks({
+    //     map: map,
+    //     bookmarks: [],
+    //     editable: true
+    // }, dojo.byId('bookmarks2'));
 
 
 
-    dojo.connect(bookmark, 'onEdit', refreshBookmarks);
-    dojo.connect(bookmark, 'onRemove', refreshBookmarks);
+    // dojo.connect(bookmark, 'onEdit', refreshBookmarks);
+    // dojo.connect(bookmark, 'onRemove', refreshBookmarks);
 
-    var bmJSON;
-    if (useLocalStorage) {
-        bmJSON = window.localStorage.getItem(storageName);
-    } else {
-        bmJSON = dojo.cookie(storageName);
-    }
-    // Load bookmarks 
-    // Fall back to a single bookmark if no cookie
-    if (bmJSON && bmJSON != 'null' && bmJSON.length > 4) {
-        console.log('cookie: ', bmJSON, bmJSON.length);
-        var bmarks = dojo.fromJson(bmJSON);
-        dojo.forEach(bmarks, function(b) {
-            bookmark.addBookmark(b);
-        });
-    } else {
-        console.log('no stored bookmarks...');
-        var bookmarkPA = {
-            "extent": {
-                "spatialReference": {
-                    "wkid": 102100
-                },
-                "xmin": -8669334,
-                "ymin": 4982379,
-                "xmax": -8664724,
-                "ymax": 4984864
-            },
-            "name": "Central Pennsylvania"
-        };
-        // bookmark.addBookmark(bookmarkCA);
-        bookmark.addBookmark(bookmarkPA);
-    }
-
-
-    function refreshBookmarks() {
-        if (useLocalStorage) {
-            window.localStorage.setItem(storageName, dojo.toJson(bookmark.toJson()));
-        } else {
-            var exp = 7; // number of days to persist the cookie
-            dojo.cookie(storageName, dojo.toJson(bookmark.toJson()), {
-                expires: exp
-            });
-        }
-    }
+    // var bmJSON;
+    // if (useLocalStorage) {
+    //     bmJSON = window.localStorage.getItem(storageName);
+    // } else {
+    //     bmJSON = dojo.cookie(storageName);
+    // }
+    // // Load bookmarks 
+    // // Fall back to a single bookmark if no cookie
+    // if (bmJSON && bmJSON != 'null' && bmJSON.length > 4) {
+    //     console.log('cookie: ', bmJSON, bmJSON.length);
+    //     var bmarks = dojo.fromJson(bmJSON);
+    //     dojo.forEach(bmarks, function(b) {
+    //         bookmark.addBookmark(b);
+    //     });
+    // } else {
+    //     console.log('no stored bookmarks...');
+    //     var bookmarkPA = {
+    //         "extent": {
+    //             "spatialReference": {
+    //                 "wkid": 102100
+    //             },
+    //             "xmin": -8669334,
+    //             "ymin": 4982379,
+    //             "xmax": -8664724,
+    //             "ymax": 4984864
+    //         },
+    //         "name": "Central Pennsylvania"
+    //     };
+    //     // bookmark.addBookmark(bookmarkCA);
+    //     bookmark.addBookmark(bookmarkPA);
+    // }
 
 
+    // function refreshBookmarks() {
+    //     if (useLocalStorage) {
+    //         window.localStorage.setItem(storageName, dojo.toJson(bookmark.toJson()));
+    //     } else {
+    //         var exp = 7; // number of days to persist the cookie
+    //         dojo.cookie(storageName, dojo.toJson(bookmark.toJson()), {
+    //             expires: exp
+    //         });
+    //     }
+    // }
 
-    function clearBookmarks() {
-        var conf = confirm('Click OK to remove your map bookmarks.');
-        if (conf) {
-            if (useLocalStorage) {
-                // Remove from local storage
-                window.localStorage.removeItem(storageName);
-            } else {
-                // Remove cookie
-                dojo.cookie(storageName, null, { expires: -1 });
-            }
-            // Remove all user defined bookmarks
-            // First get all bookmark names
-            var bmNames = dojo.map(bookmark.bookmarks, function(bm) {
-                if (bm.name != 'Central Pennsylvania') {
-                    return bm.name;
-                }
-            });
-            // Run removeBookmark
-            dojo.forEach(bmNames, function(bName) {
-                bookmark.removeBookmark(bName);
-            });
-            alert('Bookmarks Removed.');
-        }
-    }
-    // source for supports_local_storage function:
-    // http://diveintohtml5.org/detect.html
-    function supports_local_storage() {
-        try {
-            return 'localStorage' in window && window['localStorage'] !== null;
-        } catch (e) {
-            return false;
-        }
-    }
+
+
+    // function clearBookmarks() {
+    //     var conf = confirm('Click OK to remove your map bookmarks.');
+    //     if (conf) {
+    //         if (useLocalStorage) {
+    //             // Remove from local storage
+    //             window.localStorage.removeItem(storageName);
+    //         } else {
+    //             // Remove cookie
+    //             dojo.cookie(storageName, null, { expires: -1 });
+    //         }
+    //         // Remove all user defined bookmarks
+    //         // First get all bookmark names
+    //         var bmNames = dojo.map(bookmark.bookmarks, function(bm) {
+    //             if (bm.name != 'Central Pennsylvania') {
+    //                 return bm.name;
+    //             }
+    //         });
+    //         // Run removeBookmark
+    //         dojo.forEach(bmNames, function(bName) {
+    //             bookmark.removeBookmark(bName);
+    //         });
+    //         alert('Bookmarks Removed.');
+    //     }
+    // }
+    // // source for supports_local_storage function:
+    // // http://diveintohtml5.org/detect.html
+    // function supports_local_storage() {
+    //     try {
+    //         return 'localStorage' in window && window['localStorage'] !== null;
+    //     } catch (e) {
+    //         return false;
+    //     }
+    // }
 
 
     //Measure
@@ -297,7 +297,8 @@ require([
     var measurement = new Measurement({
         map: map
     }, dom.byId("measurementDiv"));
-    measurement.startup();
+    measurement.startup();   
+
 
 
 
