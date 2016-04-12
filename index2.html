@@ -17,21 +17,16 @@
 <body class="calcite">
 
     <div id="mainWindow" data-dojo-type="dijit/layout/BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width:100%; height:100%;">
+      <div style="height:40px;">
+      <select style="margin:10px" id="LayerList"></select>
 
-        <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+      <div style="position:absolute; right:880px; top:10px; z-Index:999;" >
 
-
-            <div id="rightPane" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'">
+       <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Print', closable:false, open:false">
                 <div id="printButton"></div>
+                </div>
             </div> <!--       print -->
 
-            <div style="position:absolute; right:840px; top:10px; z-Index:999;"  >
-                <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Select', closable:false, open:false">
-                    <div class="drop" id="LayerSelect"></div>
-                </div>
-            </div> <!--       Select -->
-
-            
             <div style="position:absolute; right:740px; top:10px; z-Index:999;"  >
                 <div data-dojo-type="dijit/TitlePane" data-dojo-props="title:'Legend', closable:false, open:false">
                     <div class="drop" id="legendDiv"></div>
@@ -66,8 +61,28 @@
                     </div>
                 </div>
             </div>    <!--       BaseMap -->
-        </div>    <!--        Map -->   
-    </div>    <!--     Main Window -->
+            </div>
+
+        
+     <div id="map" data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'center'">
+    <div class="right-panel">
+        <div data-dojo-type="dijit/layout/ContentPane" data-dojo-props="region:'right'" style="width:400px;margin:5px;background-color:whitesmoke;">
+            <table data-dojo-type="dojox/grid/DataGrid" jsid="grid" id="grid" data-dojo-props="rowsPerPage:'5', rowSelector:'20px'" style="height:400px; width:100%">
+                <thead>
+                    <tr>
+                        <th field="OBJECTID">ID</th>
+                        <th field="PkContractID">PkContractID</th>
+                        <th field="WebRelativeImagePath">WebRelativeImagePath</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<!--        Map -->
+</div>
+<!--     Main Window -->
 </body>
 
 </html>
+

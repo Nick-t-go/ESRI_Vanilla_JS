@@ -1,10 +1,14 @@
 html,
 body,
-#mapDiv {
+#map {
     height: 100%;
     width: 100%;
     margin: 0;
     padding: 0;
+}
+
+#mainWindow {
+    position: relative ;
 }
 
 body {
@@ -30,4 +34,22 @@ body {
 
 .drop {
     background-color: white;
+    overflow: visible;
+}
+
+.right-panel {
+    background-color: white;
+    position: absolute;
+    width: 100%;
+    bottom: 0px;
+    margin:0;
+    height: 200px;
+    z-index:100;
+    overflow: scroll;
+}
+
+th {
+    width: auto;
+    overflow: auto;
+    font-size: 10px
 }

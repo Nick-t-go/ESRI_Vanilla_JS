@@ -1,4 +1,4 @@
-var map;
+var map, grid, store;
 require([
 
     "dijit/Menu",
@@ -20,6 +20,9 @@ require([
     "esri/dijit/Print",
     "esri/symbols/SimpleMarkerSymbol",
     "dojo/query",
+    "esri/tasks/query",
+    "esri/tasks/QueryTask",
+    "esri/tasks/RelationshipQuery",
     "dijit/form/Button",
     "esri/graphic",
 
@@ -40,6 +43,10 @@ require([
     "esri/symbols/SimpleFillSymbol",
 
     "esri/dijit/Scalebar",
+    "dojo/data/ItemFileReadStore",
+    "dojox/grid/DataGrid",
+    "esri/geometry/Extent",
+
     "dijit/layout/BorderContainer",
     "dijit/layout/AccordionContainer",
     "dijit/layout/ContentPane",
@@ -48,8 +55,8 @@ require([
     "dijit/form/DropDownButton",
     "dojo/domReady!"
 ], function(
-    Menu, MenuItem, ComboButton, Bookmarks, Select, ObjectStore, Memory, Legend, arrayUtils, BasemapGallery, arcgisUtils, Draw, Print, SimpleMarkerSymbol, query, Button, Graphic, dom, Color, keys, parser,
-    esriConfig, has, Map, SnappingManager, Measurement, FeatureLayer, SimpleRenderer, GeometryService, SimpleLineSymbol, SimpleFillSymbol, Scalebar
+    Menu, MenuItem, ComboButton, Bookmarks, Select, ObjectStore, Memory, Legend, arrayUtils, BasemapGallery, arcgisUtils, Draw, Print, SimpleMarkerSymbol, query, Query, QueryTask, RelationshipQuery, Button, Graphic, dom, Color, keys, parser,
+    esriConfig, has, Map, SnappingManager, Measurement, FeatureLayer, SimpleRenderer, GeometryService, SimpleLineSymbol, SimpleFillSymbol, Scalebar, ItemFileReadStore,  DataGrid, Extent
 ) {
     parser.parse();
     //This sample may require a proxy page to handle communications with the ArcGIS Server services. You will need to
@@ -70,11 +77,11 @@ require([
     map.on("load", function() {
         toolbar = new Draw(map);
         toolbar.on("draw-end", addToMap);
-         
+
     });
 
     var useLocalStorage = supports_local_storage();
-    var storageName = 'esrijsapi_mapmarks';      
+    var storageName = 'esrijsapi_mapmarks';
 
     // var sfs = new SimpleFillSymbol(
     //     "solid",
@@ -88,15 +95,26 @@ require([
     // });
     // parcelsLayer.setRenderer(new SimpleRenderer(sfs));
 
+
+   
+
+
     var sewerOutlines = new FeatureLayer('https://fs-gdb10:6443/arcgis/rest/services/SuffolkCounty/SCSewers/MapServer/8', {
         mode: FeatureLayer.MODE_ONDEMAND,
         outFields: ["*"]
     });
 
+    sewerOutlines.relId = [4];
+
     var sewerDistricts = new FeatureLayer('https://fs-gdb10:6443/arcgis/rest/services/SuffolkCounty/SCSewers/MapServer/9', {
         mode: FeatureLayer.MODE_ONDEMAND,
         outFields: ["*"]
     });
+
+    sewerDistricts.relId = [5, 6];
+    console.log(sewerDistricts)
+
+    var selectedLayer = [sewerOutlines];
 
     var sewerSheets = new FeatureLayer('https://fs-gdb10:6443/arcgis/rest/services/SuffolkCounty/SCSewers/MapServer/7', {
         mode: FeatureLayer.MODE_ONDEMAND,
@@ -108,35 +126,42 @@ require([
         outFields: ["*"]
     });
 
+    manholes.relId = [0];
+
     var sewerMains = new FeatureLayer('https://fs-gdb10:6443/arcgis/rest/services/SuffolkCounty/SCSewers/MapServer/2', {
         mode: FeatureLayer.MODE_ONDEMAND,
         outFields: ["*"]
     });
-    console.log(sewerMains)
+    
+
 
     var layerList = [sewerOutlines, sewerDistricts, sewerSheets, manholes, sewerMains]
 
 
-    layerList.forEach(function(layer) {
-        map.addLayer(layer)
-    });
+    map.addLayers(layerList)
 
-    var store = new Memory({
-      data: layerList
-    })
 
-    var select = new Select({
-      name: "LayerSelect",
-      store: store,
-      style: "width: 200;",
-      labelAttr: "displayField",
-      maxHeight: -1,
-      onChange: function(value){
-        console.log(value)
-      }
-    }, "LayerSelect");
-      select.startup();
-  
+    //Once all layers are added populate select box for selectable features
+    map.on('layers-add-result',function(){
+      var sel = document.getElementById('LayerList');
+      var fragment = document.createDocumentFragment();
+      layerList.forEach(function(layer, index) {
+          var opt = document.createElement('option');
+          opt.innerHTML = layer.name;
+          opt.value = layer.name;
+          fragment.appendChild(opt);
+      });
+      sel.appendChild(fragment);
+      sel.onchange = function(evt){
+        d = document.getElementById("LayerList").value;
+        selectedLayer = layerList.filter(function(layer){
+          return layer.name === d;
+        })
+        console.log(selectedLayer[0])
+      };
+    })  
+
+
 
     //dojo.keys.copyKey maps to CTRL on windows and Cmd on Mac., but has wrong code for Chrome on Mac
     var snapManager = map.enableSnapping({
@@ -196,8 +221,8 @@ require([
     }
 
     var scalebar = new Scalebar({
-    map: map,
-    attachTo: "bottom-left"
+        map: map,
+        attachTo: "bottom-left"
     });
 
 
@@ -294,17 +319,66 @@ require([
         }
     }
 
-
+    //Legend
     var legend = new Legend({
         map: map
-      }, "legendDiv");
-      legend.startup();
+    }, "legendDiv");
+    legend.startup();
+
+    //Find Related Records Code
+
+    function findRelatedRecords(evt) {
+            var features = evt.features;
+            var relatedTopsQuery = new RelationshipQuery();
+            relatedTopsQuery.outFields = ["*"];
+            relatedTopsQuery.relationshipId = selectedLayer[0].relId[0];
+            relatedTopsQuery.objectIds = [features[0].attributes.OBJECTID];
+            selectedLayer[0].queryRelatedFeatures(relatedTopsQuery, function(relatedRecords) {
+              console.log("related recs: ", relatedRecords);
+              if ( ! relatedRecords.hasOwnProperty(features[0].attributes.OBJECTID) ) {
+                console.log("No related records for ObjectID: ", features[0].attributes.OBJECTID);
+                return;
+              }
+              var fset = relatedRecords[features[0].attributes.OBJECTID];
+              var items = fset.features.map (function(feature) {
+                return feature.attributes;
+              });
+              //Create data object to be used in store
+              var data = {
+                identifier: "OBJECTID",  //This field needs to have unique values
+                label: "OBJECTID", //Name field for display. Not pertinent to a grid but may be used elsewhere.
+                items: items
+              };
+
+              //Create data store and bind to grid.
+              store = new ItemFileReadStore({ data:data });
+              grid.setStore(store);
+              grid.setQuery({ OBJECTID: "*" });
+            });
+        }
+
+        function findSelected(evt) {
+          console.log('click')
+            grid.setStore(null);
+            var selectionQuery = new Query();
+            var tol = map.extent.getWidth()/map.width * 5;
+            var x = evt.mapPoint.x;
+            var y = evt.mapPoint.y;
+            var queryExtent = new Extent(x-tol,y-tol,x+tol,y+tol,evt.mapPoint.spatialReference);
+            selectionQuery.geometry = queryExtent;
+            selectedLayer[0].selectFeatures(selectionQuery,FeatureLayer.SELECTION_NEW);
+        }
+
+
+        var selectionSymbol = new SimpleMarkerSymbol().setColor("red");
+        selectedLayer[0].setSelectionSymbol(selectionSymbol);
+        selectedLayer[0].on("selection-complete", findRelatedRecords);
+
+        selectedLayer.on("click", findSelected);
 
 
 
 
-
-   
 
 
 
